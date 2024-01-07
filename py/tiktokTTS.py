@@ -5,7 +5,7 @@ import numpy as np
 import folder_paths
 import os
 
-from .TikTok import TikTok
+from utils.TikTok import TikTok
 
 
 class Text2AudioTikTokTTS:
