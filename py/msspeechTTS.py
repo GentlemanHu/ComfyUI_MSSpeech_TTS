@@ -39,7 +39,7 @@ class MSTTS_VOICE_CHOOSER:
     CATEGORY = "MicrosoftSpeech_TTS"
 
     def ms_voice(self, voice):
-        return voice
+        return {"ui":{"ms_voice":voice},"result": (voice,)}  # Return the absolute path to the output video
 
 
 

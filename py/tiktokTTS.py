@@ -172,6 +172,66 @@ class TikTokTTSException(Exception):
 
 
 
+
+
+class TikTok_VOICE_CHOOSER:
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def INPUT_TYPES(self):
+        VOICES=[
+    "en_us_ghostface",  # Ghost Face
+    "en_us_chewbacca",  # Chewbacca
+    "en_us_c3po",  # C3PO
+    "en_us_stitch",  # Stitch
+    "en_us_stormtrooper",  # Stormtrooper
+    "en_us_rocket",  # Rocket
+    "en_female_madam_leota",  # Madame Leota
+    "en_male_ghosthost",  # Ghost Host
+    "en_male_pirate",  # pirate
+    "en_au_001",  # English AU - Female
+    "en_au_002",  # English AU - Male
+    "en_uk_001",  # English UK - Male 1
+    "en_uk_003",  # English UK - Male 2
+    "en_us_001",  # English US - Female (Int. 1)
+    "en_us_002",  # English US - Female (Int. 2)
+    "en_us_006",  # English US - Male 1
+    "en_us_007",  # English US - Male 2
+    "en_us_009",  # English US - Male 3
+    "en_us_010",  # English US - Male 4
+    "en_male_narration",  # Narrator
+    "en_male_funny",  # Funny
+    "en_female_emotional",  # Peaceful
+    "en_male_cody",  # Serious
+    "en_female_f08_salut_damour",  # Alto
+    "en_male_m03_lobby",  # Tenor
+    "en_male_m03_sunshine_soon",  # Sunshine Soon
+    "en_female_f08_warmy_breeze",  # Warmy Breeze
+    "en_female_ht_f08_glorious",  # Glorious
+    "en_male_sing_funny_it_goes_up",  # It Goes Up
+    "en_male_m2_xhxs_m03_silly",  # Chipmunk
+    "en_female_ht_f08_wonderful_world",  # Dramatic
+    ]    
+        return {
+            "required": {
+                "voice": (VOICES, ),
+            },
+        }
+
+    RETURN_TYPES = ('STRING',)
+    RETURN_NAMES = ('tk_voice',)
+    FUNCTION = 'tk_voice'
+    CATEGORY = "MicrosoftSpeech_TTS"
+
+    def tk_voice(self, voice):
+        return {"ui":{"tk_voice":voice},"result": (voice,)}  # Return the absolute path to the output video
+
+
+
+
+
 class Text2AudioTikTokTTS:
     def __init__(self):
         self.output_dir = os.path.join(folder_paths.get_output_directory(), 'audio')
@@ -220,8 +280,12 @@ class Text2AudioTikTokTTS:
                 "tk_session_id": ("STRING",{"default": ""}),
                 "filename_prefix": ("STRING", {"default": "comfyUI"}),
                 "text": ("STRING", {"multiline": True}),
-                "random_voice": ("BOOLEAN",{"default": False})
-            }
+                "random_voice": ("BOOLEAN",{"default": False}),
+                "use_voice_from_input": ("BOOLEAN", {"default": False}),
+            },
+            "optional": {
+                "voice_input": ("STRING", {"default": "en_us_stormtrooper"}),
+            },
         }
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("MP3 file: String",)
@@ -230,8 +294,11 @@ class Text2AudioTikTokTTS:
 
     CATEGORY = "MicrosoftSpeech_TTS"
 
-    def t_2_audio(self,voice,filename_prefix,text,tk_session_id,random_voice):
+    def t_2_audio(self,voice,filename_prefix,text,tk_session_id,random_voice,voice_input,use_voice_from_input):
         tiktok = TikTok(session_id=tk_session_id)
+        if use_voice_from_input:
+            voice = voice_input
+        
         full_output_folder, filename, counter, subfolder, filename_prefix = folder_paths.get_save_image_path(filename_prefix, self.output_dir)
         _datetime = datetime.datetime.now().strftime("%Y%m%d")
         _datetime = _datetime + datetime.datetime.now().strftime("%H%M%S%f")
@@ -247,9 +314,11 @@ class Text2AudioTikTokTTS:
 
 
 NODE_CLASS_MAPPINGS = {
-    "TikTok_TTS": Text2AudioTikTokTTS
+    "TikTok_TTS": Text2AudioTikTokTTS,
+    "TikTok_Voice_Chooser": TikTok_VOICE_CHOOSER
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "TikTok_TTS": "MM_TikTok_TTS"
+    "TikTok_TTS": "MM_TikTok_TTS",
+    "TikTok_Voice_Chooser": "MM_TK_Voice_Chooser"
 }
